@@ -21,24 +21,31 @@ This repository contains an automated test suite for an e-commerce web applicati
 
 ### Installation
 1. Clone the repository
-
+```bash 
 git clone https://github.com/prashantFarakate/centime-selenium-pytest-assignment
+```
 
 2. Create a virtual environment
-
+```bash 
 python -m venv venv 
-On Windows: venv\Scripts\activate
-
+venv\Scripts\activate
+```
 3. Install dependencies
-
+```bash 
 pip install -r requirements.txt
+```
 
 ### Test Execution
-- Run all tests: pytest -v
+- Run all tests: 
+```bash 
+pytest -v
+```
 - Run specific test cases: pytest -m register
+```bash 
 pytest -m login
 pytest -m cart
 pytest -m address
+```
 
 ## Test Cases
 ### 1. User Registration (test_user_registration)
@@ -71,5 +78,8 @@ pytest -m address
 - Checks if saved address matches expected details.
 
 ### Reporting
-- The framework generates HTML reports after test execution when using the --html flag.
+- The framework generates HTML reports after test execution, using the --html flag.
+```bash 
+pytest -v -s --html=reports/reports.html
+```
 - Find report at reports/report.html
