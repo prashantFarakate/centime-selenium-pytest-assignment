@@ -1,5 +1,3 @@
-import json
-
 from pages.base_page import BasePage
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
@@ -11,6 +9,7 @@ class MyAccountPage(BasePage):
     REG_PASSWORD_INPUT = (By.ID, "reg_password")
     REGISTER_BUTTON = (By.NAME, "register")
 
+    LOGIN_HEADER = (By.XPATH, "//h2[text()='Login']")
     USERNAME_INPUT = (By.ID, "username")
     PASSWORD_INPUT = (By.ID, "password")
     LOGIN_BUTTON = (By.NAME, "login")
@@ -64,6 +63,9 @@ class MyAccountPage(BasePage):
         self.input_text(self.USERNAME_INPUT, username)
         self.input_text(self.PASSWORD_INPUT, password)
         self.click(self.LOGIN_BUTTON)
+
+    def get_login_header(self):
+        return self.get_element(self.LOGIN_HEADER).text
 
     def get_greeting_text(self):
         return self.get_element(self.GREETING_TEXT).text
