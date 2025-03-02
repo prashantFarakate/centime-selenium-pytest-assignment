@@ -48,6 +48,7 @@ pytest -m address
 ```
 
 ## Test Cases
+Refer **test_cases.xlsx** for detailed testcases
 ### 1. User Registration (test_user_registration)
 - Registers a new user with a unique email.
 - Verifies the greeting message.
