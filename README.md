@@ -56,18 +56,18 @@ Refer **test_cases.xlsx** for detailed testcases
 - Saves credentials for later use.
 - Logs out after registration.
 
-### 2. User Login (test_login)
+### 2. User Login (test_login, test_invalid_login)
 - Logs in using registered credentials.
 - Verifies greeting message after login.
 - Logs out and checks login page appearance.
 - Login with Invalid credential and check error message
 
-### 3. Add to Cart (test_add_to_cart)
+### 3. Add to Cart (test_add_single_product, test_add_multiple_products)
 - Add single item to the cart.
 - Adds multiple items to the cart.
 - Checks if correct items and quantities are displayed.
 
-### 4. Remove from Cart (test_remove_from_cart)
+### 4. Remove from Cart (test_delete_single_product_from_cart, test_delete_multiple_products)
 - Remove single item from the cart.
 - Removes all items from the cart.
 - Confirms the cart is empty.
