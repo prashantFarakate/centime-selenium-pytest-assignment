@@ -42,6 +42,7 @@ pytest -v
 ```
 - Run specific test cases: pytest -m register
 ```bash 
+pytest -m register
 pytest -m login
 pytest -m cart
 pytest -m address
@@ -59,12 +60,15 @@ Refer **test_cases.xlsx** for detailed testcases
 - Logs in using registered credentials.
 - Verifies greeting message after login.
 - Logs out and checks login page appearance.
+- Login with Invalid credential and check error message
 
 ### 3. Add to Cart (test_add_to_cart)
+- Add single item to the cart.
 - Adds multiple items to the cart.
 - Checks if correct items and quantities are displayed.
 
 ### 4. Remove from Cart (test_remove_from_cart)
+- Remove single item from the cart.
 - Removes all items from the cart.
 - Confirms the cart is empty.
 
