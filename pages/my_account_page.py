@@ -13,6 +13,7 @@ class MyAccountPage(BasePage):
     USERNAME_INPUT = (By.ID, "username")
     PASSWORD_INPUT = (By.ID, "password")
     LOGIN_BUTTON = (By.NAME, "login")
+    LOGIN_ERROR_MESSAGE = (By.XPATH, "//ul[@class='woocommerce-error']//li")
 
     GREETING_TEXT = (By.XPATH, "//p[contains(text(),'Hello')]")
     WELCOME_USERNAME = (By.XPATH, "//p//strong")
@@ -63,6 +64,9 @@ class MyAccountPage(BasePage):
         self.input_text(self.USERNAME_INPUT, username)
         self.input_text(self.PASSWORD_INPUT, password)
         self.click(self.LOGIN_BUTTON)
+
+    def get_error_message(self):
+        return self.get_element(self.LOGIN_ERROR_MESSAGE).text.strip()
 
     def get_login_header(self):
         return self.get_element(self.LOGIN_HEADER).text

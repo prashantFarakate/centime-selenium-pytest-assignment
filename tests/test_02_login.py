@@ -37,3 +37,31 @@ def test_login(setup, config):
     my_account_page.sign_out()
     assert my_account_page.get_login_header() == "Login", "Login header value mismatched"
     print("User Logout test passed successfully")
+
+
+@pytest.mark.login
+@pytest.mark.usefixtures('setup', 'config')
+def test_invalid_login(setup, config):
+    driver = setup
+    home_page = HomePage(driver)
+    my_account_page = MyAccountPage(driver)
+
+    invalid_email = "invalid_user@example.com"
+    invalid_password = "wrongPassword@123"
+
+    # Step 1: Navigate to My Account
+    driver.get(config.get_url())
+    home_page.navigate_to_my_account()
+
+    # Step 2: Enter invalid user details
+    my_account_page.enter_username(invalid_email)
+    my_account_page.enter_password(invalid_password)
+    my_account_page.click_login()
+
+    # Step 3: Verify error message for invalid login
+    error_message = my_account_page.get_error_message()
+    print(error_message)
+    expected_error_message = "Error: A user could not be found with this email address."
+    assert expected_error_message in error_message, f"Expected error message '{expected_error_message}', but got '{error_message}'"
+
+    print("Invalid Login test passed successfully")
