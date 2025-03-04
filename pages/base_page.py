@@ -46,6 +46,15 @@ class BasePage:
         except TimeoutException:
             return []
 
+    def wait_for_element_text_change(self, locator, old_text, timeout=10):
+        # Waits for an element's text to change from old_text to a new value.
+
+        try:
+            WebDriverWait(self.driver, timeout).until(
+                lambda driver: driver.find_element(*locator).text.strip() != old_text.strip()
+            )
+        except TimeoutException:
+            raise Exception(f"Element {locator} text did not change from '{old_text}' within {timeout} seconds")
 
 
 

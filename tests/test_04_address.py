@@ -7,9 +7,9 @@ from utilities.data_generator import generate_unique_email, get_password
 
 @pytest.mark.dependency()
 @pytest.mark.address
-@pytest.mark.usefixtures('setup', 'config')
-def test_add_address(setup, config):
-    driver = setup
+@pytest.mark.usefixtures('setup_function', 'config')
+def test_add_address(setup_function, config):
+    driver = setup_function
     home_page = HomePage(driver)
     my_account_page = MyAccountPage(driver)
 
@@ -36,9 +36,9 @@ def test_add_address(setup, config):
 
 @pytest.mark.dependency(depends=["test_add_address"])
 @pytest.mark.address
-@pytest.mark.usefixtures('setup')
-def test_saved_address(setup):
-    driver = setup
+@pytest.mark.usefixtures('setup_function')
+def test_saved_address(setup_function):
+    driver = setup_function
     my_account_page = MyAccountPage(driver)
 
     # Step 1: Navigate to Address section and get saved address
@@ -46,11 +46,12 @@ def test_saved_address(setup):
     saved_address = my_account_page.get_saved_address()
     expected_saved_address = get_expected_saved_address()
 
-    print(saved_address)
-    print(expected_saved_address)
+    # print(saved_address)
+    # print(expected_saved_address)
 
     # Step 2: Verify saved address matches expected details
     assert saved_address == expected_saved_address
+    print("Verify Saved Address details test passed Successfully")
 
 
 

@@ -77,7 +77,8 @@ class MyAccountPage(BasePage):
         self.click(self.SIGN_OUT)
 
     def click_address_link(self):
-        self.click(self.ADDRESS_LINK)
+        self.get_element(self.ADDRESS_LINK).click()
+        # self.click(self.ADDRESS_LINK)
 
     def edit_billing_address(self):
         self.click(self.EDIT_BILLING_ADDRESS)

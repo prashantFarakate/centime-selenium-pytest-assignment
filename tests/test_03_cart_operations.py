@@ -1,98 +1,114 @@
 import pytest
-from pytest_dependency import depends
-from pages.cart_page import CartPage
 from pages.home_page import HomePage
 from pages.shop_page import ShopPage
+from pages.cart_page import CartPage
 
-@pytest.mark.cart
-@pytest.mark.dependency()
 @pytest.mark.usefixtures('setup', 'config')
-def test_add_to_cart(setup, config):
-    """
-       Test adding multiple products to the cart.
+class TestCart:
 
-       This test:
-       1. Navigates to the shop page
-       2. Adds specific products to the cart
-       3. Verifies that all products are added correctly
-       4. Checks product names, quantities, and total cart count
-    """
+    @pytest.fixture(autouse=True)
+    def setup_method(self, setup, config):
+        self.driver = setup
+        self.config = config
+        self.home_page = HomePage(self.driver)
+        self.shop_page = ShopPage(self.driver)
+        self.cart_page = CartPage(self.driver)
 
-    # Test Date - Products to add
-    product_wishlist = ["Selenium Ruby", "Functional Programming in JS", "Mastering JavaScript"]
+    def add_products(self, product_wishlist):
+        # Reusable function to add multiple products to the cart
+        self.driver.get(self.config.get_url())
+        self.home_page.navigate_to_shop()
 
-    driver = setup
-    home_page = HomePage(driver)
-    shop_page = ShopPage(driver)
-    cart_page = CartPage(driver)
+        # Get list of available products on the shop page
+        product_elements = self.shop_page.get_product_list()
+        product_names = self.shop_page.get_product_names(product_elements)
 
-    # Step 1: Navigate to the website and shop page
-    driver.get(config.get_url())
-    home_page.navigate_to_shop()
+        # Add products from wishlist to the cart
+        added_count = sum(
+            1 for name, element in zip(product_names, product_elements)
+            if name in product_wishlist and self.shop_page.add_to_basket(element)
+        )
 
-    # Step 2: Get all products from the shop page
-    product_elements = shop_page.get_product_list()
-    product_names = shop_page.get_product_names(product_elements)
+        assert self.shop_page.is_view_basket_visible(), "View Basket is not visible"
+        return added_count
 
-    # Step 3: Add each product from wishlist to the cart
-    products_to_add = 0
-    for product_name, product_element in zip(product_names, product_elements):
-        if product_name in product_wishlist:
-            # print(product_name, 'Yes')
-            shop_page.add_to_basket(product_element)
-            assert shop_page.is_view_basket_visible(), "View Basket is not visible"
-            print(f"Products '{product_name}' added to the Cart successfully")
-            products_to_add += 1
-    # time.sleep(2)
+    def verify_cart_items(self, expected_products):
+        # Reusable function to verify cart items
+        cart_items = self.cart_page.get_cart_items()
+        assert len(cart_items) == len(expected_products), "Cart Item count mismatched"
 
-    # Step 4: Verify cart icon updates with correct count
-    shop_page.wait_for_cart_icon_to_update()
-    assert shop_page.get_added_items_count() == products_to_add, "Item count is not matching with added Items"
+        # Validate product details in the cart
+        for item in cart_items:
+            details = self.cart_page.get_product_details(item)
+            assert details['name'] in expected_products, f"Unexpected product: {details['name']}"
+            assert details['quantity'] == '1', f"Incorrect quantity for {details['name']}"
 
-    # Step 5: Navigate to cart page
-    shop_page.navigate_to_cart()
+    def test_add_single_product(self):
+        product_wishlist = ["Selenium Ruby"]
+        products_added = self.add_products(product_wishlist)
 
-    # Step 5: Verify total number of items in cart
-    cart_items = cart_page.get_cart_items()
-    assert len(cart_items) == products_to_add == len(product_wishlist), "Cart Item count mismatched"
+        # Ensure cart icon updates with correct count
+        self.shop_page.wait_for_cart_icon_to_update()
+        assert self.shop_page.get_added_items_count() == products_added, "Mismatch in added items"
 
-    # Step 7: Verify each product's details in cart
-    for item in cart_items:
-        item_details = cart_page.get_product_details(item)
-        assert item_details['name'] in product_wishlist, "Cart contains unexpected product"
-        assert item_details['quantity'] == '1', f"Unexpected quantity for {item_details['name']}"
+        # Navigate to cart and verify added product
+        self.shop_page.navigate_to_cart()
+        self.verify_cart_items(product_wishlist)
 
-    print("Add to Cart Test passed Successfully")
+        print("Add Single Product Test Passed Successfully")
 
+    def test_add_multiple_products(self):
+        product_wishlist = ["Selenium Ruby", "Functional Programming in JS", "Mastering JavaScript"]
+        products_added = self.add_products(product_wishlist)
 
-@pytest.mark.cart
-@pytest.mark.dependency(depends=['test_add_to_cart'])
-@pytest.mark.usefixtures('setup')
-def test_remove_from_cart(setup):
+        # Verify cart icon updates with correct count
+        self.shop_page.wait_for_cart_icon_to_update()
+        assert self.shop_page.get_added_items_count() == products_added, "Mismatch in added items"
 
-    driver = setup
-    cart_page = CartPage(driver)
+        # Navigate to cart and verify all products are present
+        self.shop_page.navigate_to_cart()
+        self.verify_cart_items(product_wishlist)
 
-    # Step 1: Verify we have items to remove first
-    cart_items = cart_page.get_cart_items()
-    assert cart_items, "No items in cart to remove - dependency on test_add_to_cart may have failed"
+        print("Add Multiple Products Test Passed Successfully")
 
-    # Step 2: Remove all items one by one
-    while True:
-        cart_items = cart_page.get_cart_items()
-        if not cart_items:
-            break
-        cart_page.remove_product(cart_items[0])
-        print("Cart Items removed successfully")
+    def test_delete_single_product_from_cart(self):
+        # Test case to add a single product and then delete it from the cart
+        product_wishlist = ["Selenium Ruby"]
+        products_added = self.add_products(product_wishlist)
 
-    # Step 3: Verify if Cart is empty
-    assert cart_page.is_cart_empty() == "Your basket is currently empty.", "Empty Cart message is not displayed"
+        self.shop_page.wait_for_cart_icon_to_update()
+        assert self.shop_page.get_added_items_count() == products_added, "Mismatch in added items"
 
-    print("Remove item from Cart Test passed successfully ")
+        self.shop_page.navigate_to_cart()
+        self.verify_cart_items(product_wishlist)
 
+        # Removing the product from the cart
+        cart_items = self.cart_page.get_cart_items()
+        for item in cart_items:
+            self.cart_page.remove_product(item)
 
+        # Verify cart is empty after deletion
+        assert self.cart_page.is_cart_empty(), "Cart is not empty after deleting products"
 
+        print("Delete Single Product Test Passed Successfully")
 
+    def test_delete_multiple_products(self):
+        #Add multiple products and delete them one by one from the cart
+        product_wishlist = ["Selenium Ruby", "Functional Programming in JS", "Mastering JavaScript"]
+        self.add_products(product_wishlist)
 
+        self.shop_page.navigate_to_cart()
+        cart_items = self.cart_page.get_cart_items()
+        assert len(cart_items) == len(product_wishlist), "Mismatch in cart items before deletion"
 
+        # Remove all products one by one
+        while True:
+            cart_items = self.cart_page.get_cart_items()
+            if not cart_items:
+                break
+            self.cart_page.remove_product(cart_items[0])
+            print("Cart Items removed successfully")
 
+        assert self.cart_page.is_cart_empty(), "Cart is not empty after deleting all products"
+
+        print("Delete Multiple Products Test Passed Successfully")
